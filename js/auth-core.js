@@ -9,14 +9,14 @@ const CKA = (() => {
   const SESSION_HOURS = 8;
   const MIN_PACE_MS = 1200; // 「間」— deliberately paced
 
-  // 32色パレット(石垣の色アンカー4色を含む)
+  // 32色パレット + 銀(ゲスト用)(石垣の色アンカー4色を含む)
   const PAL = [
     '#1A237E','#F9A825','#1B6B5A','#E8E0D0',
     '#FF6B35','#FFD166','#06D6A0','#118AB2','#EF476F','#26547C',
     '#FFB703','#FB8500','#8338EC','#3A86FF','#FF006E','#1E88E5',
     '#9B7FF4','#3DD68C','#F06060','#C8920A','#8B1A1A','#CC3300',
     '#F0C040','#00BCD4','#FF7043','#66BB6A','#5C6BC0','#CE93D8',
-    '#2E7D32','#6D4C41','#455A64','#D81B60'
+    '#2E7D32','#6D4C41','#455A64','#D81B60','#C0C0C0'
   ];
 
   function normalize(pairs){

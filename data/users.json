@@ -12,6 +12,30 @@
       "salt": "15ae49c63b2ac0837dce2c0ab6e8a614",
       "iterations": 310000,
       "hash": "40c25cb8fa1886e2fea202d8cf379fd8cf360a523e6479670ac06efac264e3da"
+    },
+    {
+      "id": "guest-ja",
+      "label": "鈴木 一朗(ゲスト)",
+      "hint": "ヒント: 鈴=銀色(鈴の音)、朗=黄色(朗の中の月)",
+      "chars": [
+        "鈴",
+        "朗"
+      ],
+      "salt": "b3ae78c825fd5abbdc47b67284776a64",
+      "iterations": 310000,
+      "hash": "60742b08c0809687ddc8faa25022ada4d8d4b8d74d07e73afe3cd1010d755f48"
+    },
+    {
+      "id": "guest-en",
+      "label": "John Smith (Guest)",
+      "hint": "Hint: J = Orange (Sunset) / S = Blue (Ocean)",
+      "chars": [
+        "J",
+        "S"
+      ],
+      "salt": "7beae286d24b0c1f7ea35c6084ab6352",
+      "iterations": 310000,
+      "hash": "9a4244cf47ec20c885381085ec242c8e878ac9503212c93c1384dbabc5c0bcf7"
     }
   ]
 }
