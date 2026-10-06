@@ -1,0 +1,11 @@
+{
+  "note": "ランチャーに表示するサービスのINDEX。フラットファイル — RDBなし。表示順はこの配列の順。",
+  "services": [
+    { "id": "bazaarbazaar", "icon": "🌐", "name": "バザールバザール", "desc": "コミュニティ × 会員管理 × ファイルシェア", "cat": "B2C", "url": "#", "live": false },
+    { "id": "mirai-kanri", "icon": "📊", "name": "未来かんり", "desc": "人・モノ・金・時間の統合INDEX(軽量ERP)", "cat": "B2B", "url": "#", "live": false },
+    { "id": "nippo-kanri", "icon": "📝", "name": "日報かんり", "desc": "日々の作業 → PROJECT × 時間 × 単価 = 原価", "cat": "B2B", "url": "#", "live": false },
+    { "id": "kanji-index", "icon": "📖", "name": "天然色漢字INDEX™", "desc": "出版社別デモ・インフォグラフィック", "cat": "INDEX", "url": "https://robertohoshino.github.io/kanji-index/", "live": true },
+    { "id": "wearee", "icon": "🎨", "name": "WeARee!", "desc": "セザンヌのアトリエ VRツアー × 文化体験", "cat": "B2C", "url": "https://cezanne.wearee.jp/index/content/2577", "live": true },
+    { "id": "digiterior", "icon": "⛩", "name": "DIGITERIOR", "desc": "哲学・html-notes・reference-index", "cat": "HOME", "url": "https://digiterior.net", "live": true }
+  ]
+}

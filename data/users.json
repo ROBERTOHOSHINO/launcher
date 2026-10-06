@@ -1,0 +1,17 @@
+{
+  "note": "DEMO anchors — 実運用では利用者本人の私的な記憶を使う",
+  "users": [
+    {
+      "id": "roberto",
+      "label": "星野 晃一郎",
+      "labelHint": "Digiterior Studio",
+      "chars": [
+        "星",
+        "晃"
+      ],
+      "salt": "15ae49c63b2ac0837dce2c0ab6e8a614",
+      "iterations": 310000,
+      "hash": "40c25cb8fa1886e2fea202d8cf379fd8cf360a523e6479670ac06efac264e3da"
+    }
+  ]
+}
