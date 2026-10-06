@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CHROMAKEY AUTH™ — Gate</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@700;900&display=swap');
+:root{
+  --indigo:#1A237E; --gold:#F9A825; --ivory:#E8E0D0; --ink:#22201c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--ivory);color:var(--ink);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:#fff;border:1px solid rgba(26,35,126,.12);border-radius:16px;
+  max-width:480px;width:100%;padding:36px 28px;box-shadow:0 14px 40px rgba(26,35,126,.10);position:relative;overflow:hidden}
+.card::before{content:'鍵';font-family:'Noto Serif JP',serif;font-weight:900;font-size:220px;
+  position:absolute;right:-40px;top:-70px;color:var(--indigo);opacity:.04;pointer-events:none;line-height:1}
+.brand{font-size:10px;letter-spacing:4px;color:var(--indigo);opacity:.65;margin-bottom:8px}
+h1{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;color:var(--indigo);margin-bottom:4px}
+.sub{font-size:12px;line-height:1.9;color:#6a655c;margin-bottom:22px}
+.step-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--indigo);margin:18px 0 8px}
+.users{display:flex;gap:8px;flex-wrap:wrap}
+.user-btn{border:1.5px solid rgba(26,35,126,.25);background:#fff;border-radius:10px;
+  padding:10px 16px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.user-btn.on{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.slots{display:flex;gap:14px;margin:6px 0 4px}
+.slot{flex:1;text-align:center}
+.slot-char{font-family:'Noto Serif JP',serif;font-size:56px;font-weight:900;line-height:1.5;
+  border-radius:12px;border:2px solid rgba(0,0,0,.08);background:#faf8f4;transition:background .25s,color .25s}
+.slot-hex{font-size:10px;letter-spacing:1px;color:#8a837c;margin-top:4px;min-height:14px}
+.pal{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:8px}
+.sw{aspect-ratio:1;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.sw.on{border-color:var(--ink);transform:scale(1.12)}
+.go{width:100%;margin-top:22px;padding:14px;border:none;border-radius:10px;cursor:pointer;
+  background:var(--indigo);color:#fff;font-size:15px;font-weight:700;font-family:inherit;letter-spacing:1px}
+.go:disabled{opacity:.45;cursor:default}
+.msg{margin-top:14px;font-size:12.5px;line-height:1.8;min-height:20px;text-align:center}
+.msg.ok{color:#1B6B5A;font-weight:700}
+.msg.ng{color:#8B1A1A;font-weight:700}
+.pace{color:#8a837c}
+.note{margin-top:20px;padding-top:14px;border-top:1px solid rgba(0,0,0,.07);
+  font-size:10.5px;line-height:1.8;color:#8a837c}
+.note b{color:var(--gold)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s ease}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="brand">CHROMAKEY AUTH™ · COLOURFUL JAPAN™</div>
+  <h1>視覚的な指紋で認証</h1>
+  <div class="sub">あなたの名前の文字に、あなたの記憶の色を。<br>正解はこのページのどこにも書かれていません。</div>
+
+  <div class="step-label">1 — 名前を選ぶ</div>
+  <div class="users" id="users">読み込み中…</div>
+
+  <div id="authArea" style="display:none">
+    <div class="step-label">2 — それぞれの文字に、記憶の色を</div>
+    <div class="slots" id="slots"></div>
+    <div class="pal" id="pal"></div>
+    <button class="go" id="go" disabled>認証する</button>
+  </div>
+  <div class="msg" id="msg"></div>
+
+  <div class="note">
+    照合は端末内で PBKDF2-SHA256(310,000回)により行われ、記録には salt とハッシュのみが保存されます。
+    応答は <b>deliberately paced</b> —「間」を設けています。
+    このデモの色は公開済みのデモ用アンカーです。実運用では利用者本人の私的な記憶を使います。
+  </div>
+</div>
+
+<script src="js/auth-core.js"></script>
+<script>
+let USERS=[], user=null, sel=[], activeSlot=0;
+
+function renderUsers(){
+  const box=document.getElementById('users'); box.innerHTML='';
+  USERS.forEach(u=>{
+    const b=document.createElement('button');
+    b.className='user-btn'; b.textContent=u.label;
+    b.onclick=()=>{ user=u; sel=u.chars.map(c=>({char:c,hex:null})); activeSlot=0;
+      document.querySelectorAll('.user-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); document.getElementById('authArea').style.display='block';
+      setMsg(''); renderSlots(); renderPal(); };
+    box.appendChild(b);
+  });
+}
+function renderSlots(){
+  const box=document.getElementById('slots'); box.innerHTML='';
+  sel.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='slot';
+    const ch=document.createElement('div'); ch.className='slot-char'; ch.textContent=p.char;
+    if(p.hex){ ch.style.background=p.hex; ch.style.color=contrast(p.hex); }
+    if(i===activeSlot){ ch.style.borderColor='var(--gold)'; }
+    ch.onclick=()=>{ activeSlot=i; renderSlots(); };
+    const hx=document.createElement('div'); hx.className='slot-hex'; hx.textContent=p.hex||'（色を選んでください）';
+    d.appendChild(ch); d.appendChild(hx); box.appendChild(d);
+  });
+  document.getElementById('go').disabled = !sel.every(p=>p.hex);
+}
+function renderPal(){
+  const box=document.getElementById('pal'); box.innerHTML='';
+  CKA.PAL.forEach(hex=>{
+    const s=document.createElement('div'); s.className='sw'; s.style.background=hex;
+    if(sel[activeSlot] && sel[activeSlot].hex===hex) s.classList.add('on');
+    s.onclick=()=>{ sel[activeSlot].hex=hex;
+      if(activeSlot<sel.length-1) activeSlot++;
+      renderSlots(); renderPal(); };
+    box.appendChild(s);
+  });
+}
+function contrast(hex){
+  const n=parseInt(hex.slice(1),16), r=n>>16, g=(n>>8)&255, b=n&255;
+  return (0.299*r+0.587*g+0.114*b)>150 ? '#22201c' : '#ffffff';
+}
+function setMsg(t,cls){ const m=document.getElementById('msg'); m.textContent=t; m.className='msg '+(cls||''); }
+
+document.getElementById('go').onclick=async()=>{
+  const btn=document.getElementById('go'); btn.disabled=true;
+  setMsg('照合しています —「間」','pace');
+  const ok=await CKA.verify(user, sel);
+  if(ok){
+    const s=CKA.openSession(user);
+    setMsg('認証成功 — ようこそ、'+user.label+' さん','ok');
+    setTimeout(()=>{ location.href='launcher.html'; }, 700);
+  }else{
+    setMsg('漢字と色の組み合わせが一致しません','ng');
+    document.getElementById('card').classList.add('shake');
+    setTimeout(()=>document.getElementById('card').classList.remove('shake'),450);
+    btn.disabled=false;
+  }
+};
+
+CKA.loadUsers().then(us=>{ USERS=us; renderUsers(); })
+  .catch(()=>{ document.getElementById('users').textContent='users.json を読み込めませんでした（ローカルではHTTPサーバ経由で開いてください）'; });
+</script>
+</body>
+</html>

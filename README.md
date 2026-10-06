@@ -1,5 +1,5 @@
-# launcher
-chromakey-launcher-v0.1
+# CHROMAKEY AUTH™ — Launcher
+
 Digiterior Studio — founder + Claude
 静的サイト(GitHub Pages)のままで動く、名前×色の記憶による認証と、その先のLauncher。
 

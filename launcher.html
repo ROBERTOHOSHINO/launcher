@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAUNCHER™ — CHROMAKEY AUTH</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@700;900&display=swap');
+:root{ --indigo:#1A237E; --gold:#F9A825; --ivory:#E8E0D0; --ink:#22201c; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--ivory);color:var(--ink);min-height:100vh}
+header{background:var(--indigo);color:#fff;padding:22px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.h-kanji{font-family:'Noto Serif JP',serif;font-weight:900;font-size:34px;line-height:1;
+  background:rgba(255,255,255,.1);border-radius:10px;padding:8px 12px}
+.h-title{font-size:16px;font-weight:700}
+.h-sub{font-size:11px;opacity:.65;margin-top:2px}
+.h-right{margin-left:auto;text-align:right;font-size:11px;opacity:.85}
+.h-right button{margin-top:6px;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;
+  border-radius:8px;padding:5px 14px;font-size:11px;cursor:pointer;font-family:inherit}
+main{max-width:860px;margin:0 auto;padding:28px 20px 48px}
+.sec{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;color:var(--indigo);
+  margin:8px 0 14px;display:flex;align-items:center;gap:10px}
+.sec::before{content:'';width:4px;height:18px;background:var(--gold);border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tile{background:#fff;border:1px solid rgba(26,35,126,.12);border-radius:14px;padding:18px;
+  text-decoration:none;color:inherit;display:block;transition:transform .12s,box-shadow .12s;position:relative}
+.tile:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(26,35,126,.12)}
+.tile-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tile-icon{font-size:26px}
+.tile-name{font-weight:700;font-size:14.5px}
+.tile-desc{font-size:11.5px;line-height:1.8;color:#6a655c}
+.tile-cat{position:absolute;top:12px;right:12px;font-size:9px;letter-spacing:1px;
+  color:var(--indigo);border:1px solid rgba(26,35,126,.3);border-radius:10px;padding:2px 8px}
+.tile.dim{opacity:.55}
+.tile .soon{font-size:9.5px;color:#8a837c;margin-top:6px}
+footer{text-align:center;font-size:10px;color:#8a837c;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-kanji" id="hKanji">星</div>
+  <div>
+    <div class="h-title" id="hName">—</div>
+    <div class="h-sub">CHROMAKEY AUTH™ セッション有効 · Digiterior Studio</div>
+  </div>
+  <div class="h-right">
+    <div id="hSess">—</div>
+    <button onclick="doLogout()">ログアウト</button>
+  </div>
+</header>
+<main>
+  <div class="sec">サービス</div>
+  <div class="grid" id="grid">読み込み中…</div>
+</main>
+<footer>LAUNCHER™ v0.1 — flat-file + INDEX · no RDB · Love your life, love your time®</footer>
+
+<script src="js/auth-core.js"></script>
+<script>
+const sess = CKA.getSession();
+if(!sess){ location.replace('index.html'); }
+else{
+  document.getElementById('hName').textContent = sess.label;
+  document.getElementById('hKanji').textContent = (sess.label||'星')[0]==='星'?'星':sess.label[0];
+  const mins = Math.max(0, Math.round((sess.exp - Date.now())/60000));
+  document.getElementById('hSess').textContent =
+    `有効期限: ${Math.floor(mins/60)}時間${mins%60}分後 · Token: ${sess.token.slice(0,12)}…`;
+
+  fetch('data/services.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+    const g=document.getElementById('grid'); g.innerHTML='';
+    d.services.forEach(s=>{
+      const a=document.createElement('a');
+      a.className='tile'+(s.live?'':' dim');
+      a.href=s.live?s.url:'#'; if(s.live) a.target='_blank';
+      a.innerHTML=`<span class="tile-cat">${s.cat}</span>
+        <div class="tile-top"><span class="tile-icon">${s.icon}</span><span class="tile-name">${s.name}</span></div>
+        <div class="tile-desc">${s.desc}</div>${s.live?'':'<div class="soon">準備中 — services.json で live:true にすると開通</div>'}`;
+      g.appendChild(a);
+    });
+  }).catch(()=>{ document.getElementById('grid').textContent='services.json を読み込めませんでした'; });
+}
+function doLogout(){ CKA.logout(); location.replace('index.html'); }
+</script>
+</body>
+</html>
